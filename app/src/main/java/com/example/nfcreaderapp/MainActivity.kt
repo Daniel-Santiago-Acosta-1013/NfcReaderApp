@@ -8,6 +8,8 @@ import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.os.Bundle
 import android.provider.Settings
+import android.view.animation.Animation
+import android.view.animation.ScaleAnimation
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +18,21 @@ class MainActivity : AppCompatActivity() {
 
     private var nfcAdapter: NfcAdapter? = null
     private lateinit var nfcDataTextView: TextView
+
+    private fun startNFCListening() {
+        // Aquí puedes agregar la lógica necesaria para comenzar a escuchar NFC
+        nfcAdapter?.enableReaderMode(this, { tag ->
+            // Aquí puedes manejar el tag NFC detectado
+            runOnUiThread {
+                nfcDataTextView.text = getString(R.string.nfc_data, tag.toString())
+            }
+        }, NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_NFC_B, null)
+    }
+
+    private fun stopNFCListening() {
+        // Detener el modo de lectura NFC cuando ya no se necesite escuchar NFC
+        nfcAdapter?.disableReaderMode(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +58,32 @@ class MainActivity : AppCompatActivity() {
         // Configurar botón para iniciar la lectura de NFC
         val nfcButton: Button = findViewById(R.id.nfcButton)
         nfcButton.setOnClickListener {
+            // Iniciar la animación durante 10 segundos
+            val scaleAnimation = ScaleAnimation(
+                1f, 1.2f, // De tamaño normal a 20% más grande
+                1f, 1.2f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f
+            ).apply {
+                duration = 10000 // Duración de la animación en milisegundos
+                repeatCount = 0 // No repetir la animación
+                fillAfter = true // Mantener el estado al finalizar
+            }
+
+            // Iniciar la animación
+            nfcButton.startAnimation(scaleAnimation)
+
             nfcDataTextView.setText(R.string.nfc_waiting)
+
+            // Aquí deberías empezar el proceso de lectura de NFC (10 segundos de escucha)
+            startNFCListening()
+
+            // Detener la animación después de 10 segundos
+            nfcButton.postDelayed({
+                scaleAnimation.cancel()
+                // Detener la escucha de NFC
+                stopNFCListening()
+            }, 10000)
         }
     }
 
