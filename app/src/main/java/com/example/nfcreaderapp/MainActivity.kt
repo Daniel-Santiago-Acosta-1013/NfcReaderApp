@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         nfcAdapter?.enableReaderMode(this, { tag ->
             // Aquí puedes manejar el tag NFC detectado
             runOnUiThread {
-                nfcDataTextView.text = getString(R.string.nfc_data, tag.toString())
+                handleNfcTag(tag)
             }
         }, NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_NFC_B, null)
     }
@@ -130,6 +130,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Manejar la información del tag NFC y pasarla a la nueva actividad
+    private fun handleNfcTag(tag: Tag) {
+        val ndef = Ndef.get(tag)
+        ndef?.cachedNdefMessage?.let { message ->
+            val records = message.records
+            if (records.isNotEmpty()) {
+                val nfcData = String(records[0].payload)
+                val nfcDetails = records.joinToString("\n") { record ->
+                    "Record Type: ${record.tnf}, Data: ${String(record.payload)}"
+                }
+
+                // Enviar los datos a NfcDetailsActivity
+                val intent = Intent(this, NfcDetailsActivity::class.java)
+                intent.putExtra("NFC_DATA", nfcData)
+                intent.putExtra("NFC_DETAILS", nfcDetails)
+                startActivity(intent)
+            } else {
+                nfcDataTextView.setText(R.string.nfc_empty)
+            }
+        } ?: run {
+            nfcDataTextView.setText(R.string.nfc_empty)
+        }
+    }
+
     // Función para mostrar el diálogo de NFC no soportado
     private fun showNfcNotSupportedDialog() {
         val builder = AlertDialog.Builder(this)
@@ -173,18 +197,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             tag?.let {
-                val ndef = Ndef.get(tag)
-                ndef?.cachedNdefMessage?.let { message ->
-                    val records = message.records
-                    if (records.isNotEmpty()) {
-                        val nfcData = String(records[0].payload)
-                        nfcDataTextView.text = getString(R.string.nfc_data, nfcData)
-                    } else {
-                        nfcDataTextView.setText(R.string.nfc_empty)
-                    }
-                } ?: run {
-                    nfcDataTextView.setText(R.string.nfc_empty)
-                }
+                handleNfcTag(it)
             }
         }
     }

@@ -9,4 +9,9 @@
         android:id="@+id/mainActivity"
         android:name="com.example.nfcreaderapp.MainActivity"
         android:label="@string/app_name" />
+
+    <activity
+        android:id="@+id/nfcDetailsActivity"
+        android:name="com.example.nfcreaderapp.NfcDetailsActivity"
+        android:label="NFC Details" />
 </navigation>
