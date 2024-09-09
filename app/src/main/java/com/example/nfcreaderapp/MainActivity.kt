@@ -8,12 +8,15 @@ import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.os.Bundle
+import android.view.View
 import android.provider.Settings
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import android.view.animation.AlphaAnimation
+import android.view.animation.AnimationSet
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,6 +36,29 @@ class MainActivity : AppCompatActivity() {
     private fun stopNFCListening() {
         // Detener el modo de lectura NFC cuando ya no se necesite escuchar NFC
         nfcAdapter?.disableReaderMode(this)
+    }
+
+    private fun createCircleAnimation(duration: Long): AnimationSet {
+        val scaleAnimation = ScaleAnimation(
+            1f, 1.5f, // Aumentar el tamaño en 50%
+            1f, 1.5f,
+            Animation.RELATIVE_TO_SELF, 0.5f,
+            Animation.RELATIVE_TO_SELF, 0.5f
+        )
+        scaleAnimation.duration = duration
+        scaleAnimation.repeatCount = Animation.INFINITE
+        scaleAnimation.repeatMode = Animation.REVERSE
+
+        val alphaAnimation = AlphaAnimation(1f, 0f)
+        alphaAnimation.duration = duration
+        alphaAnimation.repeatCount = Animation.INFINITE
+        alphaAnimation.repeatMode = Animation.REVERSE
+
+        val animationSet = AnimationSet(true)
+        animationSet.addAnimation(scaleAnimation)
+        animationSet.addAnimation(alphaAnimation)
+
+        return animationSet
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,29 +85,45 @@ class MainActivity : AppCompatActivity() {
         // Configurar botón para iniciar la lectura de NFC
         val nfcButton: Button = findViewById(R.id.nfcButton)
         nfcButton.setOnClickListener {
-            // Iniciar la animación durante 10 segundos
+            // Animación de "respiración" (pulsación) para el botón
             val scaleAnimation = ScaleAnimation(
                 1f, 1.2f, // De tamaño normal a 20% más grande
                 1f, 1.2f,
                 Animation.RELATIVE_TO_SELF, 0.5f,
                 Animation.RELATIVE_TO_SELF, 0.5f
             ).apply {
-                duration = 10000 // Duración de la animación en milisegundos
-                repeatCount = 0 // No repetir la animación
-                fillAfter = true // Mantener el estado al finalizar
+                duration = 1000 // Cada pulsación dura 1 segundo
+                repeatCount = Animation.INFINITE // La animación se repite indefinidamente
+                repeatMode = Animation.REVERSE
             }
 
-            // Iniciar la animación
             nfcButton.startAnimation(scaleAnimation)
+
+            // Animaciones de escala y opacidad para los círculos concéntricos
+            val circle1 = findViewById<View>(R.id.circle1)
+            val circle2 = findViewById<View>(R.id.circle2)
+            val circle3 = findViewById<View>(R.id.circle3)
+
+            val circleAnimation1 = createCircleAnimation(3000)
+            val circleAnimation2 = createCircleAnimation(4000)
+            val circleAnimation3 = createCircleAnimation(5000)
+
+            circle1.startAnimation(circleAnimation1)
+            circle2.startAnimation(circleAnimation2)
+            circle3.startAnimation(circleAnimation3)
 
             nfcDataTextView.setText(R.string.nfc_waiting)
 
-            // Aquí deberías empezar el proceso de lectura de NFC (10 segundos de escucha)
+            // Iniciar el proceso de escucha NFC (10 segundos de escucha)
             startNFCListening()
 
             // Detener la animación después de 10 segundos
             nfcButton.postDelayed({
                 scaleAnimation.cancel()
+                circle1.clearAnimation()
+                circle2.clearAnimation()
+                circle3.clearAnimation()
+
                 // Detener la escucha de NFC
                 stopNFCListening()
             }, 10000)
