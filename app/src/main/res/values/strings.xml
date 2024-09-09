@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">NfcReaderApp</string>
+    <string name="nfc_disabled">NFC está desactivado. Habilítalo en configuraciones.</string>
+    <string name="nfc_data">Datos NFC: %1$s</string>
+    <string name="nfc_empty">La etiqueta NFC está vacía.</string>
+    <string name="action_settings">Configuración</string>
+    <string name="read_nfc">Leer NFC</string>
+    <string name="nfc_waiting">Esperando etiqueta NFC...</string>
+    <string name="nfc_not_supported">Este dispositivo no soporta NFC.</string>
+</resources>
