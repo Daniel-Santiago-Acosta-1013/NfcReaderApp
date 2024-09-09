@@ -1,5 +1,6 @@
 package com.example.nfcreaderapp
 
+import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.IntentFilter
@@ -44,8 +45,8 @@ class MainActivity : AppCompatActivity() {
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
         if (nfcAdapter == null) {
-            // Si el dispositivo no soporta NFC o el adaptador NFC es null, se muestra un mensaje.
-            nfcDataTextView.setText(R.string.nfc_not_supported)
+            // Si el dispositivo no soporta NFC o el adaptador NFC es null, mostramos un modal (AlertDialog)
+            showNfcNotSupportedDialog()
             return // Terminar la ejecución de onCreate si no hay soporte NFC
         }
 
@@ -85,6 +86,19 @@ class MainActivity : AppCompatActivity() {
                 stopNFCListening()
             }, 10000)
         }
+    }
+
+    // Función para mostrar el diálogo de NFC no soportado
+    private fun showNfcNotSupportedDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(getString(R.string.nfc_not_supported))
+        builder.setMessage(getString(R.string.nfc_not_supported_message))
+        builder.setPositiveButton("OK") { dialog, _ ->
+            dialog.dismiss()
+            finish() // Finalizar la actividad ya que no tiene sentido continuar sin NFC
+        }
+        builder.setCancelable(false)
+        builder.show()
     }
 
     override fun onResume() {
@@ -133,4 +147,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-

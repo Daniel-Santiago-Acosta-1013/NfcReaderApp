@@ -7,4 +7,5 @@
     <string name="read_nfc">Leer NFC</string>
     <string name="nfc_waiting">Esperando etiqueta NFC...</string>
     <string name="nfc_not_supported">Este dispositivo no soporta NFC.</string>
+    <string name="nfc_not_supported_message">El dispositivo que estás utilizando no tiene soporte para NFC. Por favor, intenta usar un dispositivo compatible.</string>
 </resources>
