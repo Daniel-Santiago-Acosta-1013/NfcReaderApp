@@ -24,6 +24,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".NfcDetailsActivity"
+            android:label="NFC Details"
+            android:theme="@style/Theme.NfcReaderApp" />
+
     </application>
 
 </manifest>
